@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>APEIRON — Instituto de Arquitectura No Euclidiana</title>
+    <meta name="description" content="Una experiencia WebGL donde la arquitectura se calcula en tiempo real: ciudades paramétricas, espacios imposibles, estructuras que se transforman y un laboratorio para diseñar torres que no deberían existir." />
+    <meta name="theme-color" content="#060607" />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23060607'/%3E%3Cpath d='M16 4 28 28H4Z' fill='none' stroke='%23ff4a1c' stroke-width='2.5'/%3E%3C/svg%3E" />
+  </head>
+  <body>
+    <canvas id="gl" aria-hidden="true"></canvas>
+
+    <!-- ═══════════════ PRELOADER -->
+    <div id="preloader" data-ui>
+      <div class="pl-top mono">
+        <span>APEIRON / I.A.N.E.</span>
+        <span id="pl-step">INICIANDO</span>
+      </div>
+      <svg class="pl-drawing" viewBox="0 0 640 320" fill="none" aria-hidden="true">
+        <g stroke="currentColor" stroke-width="1">
+          <path class="d" d="M20 300H620" />
+          <path class="d" d="M80 300V120L160 60L240 120V300" />
+          <path class="d" d="M240 300V40H330V300" />
+          <path class="d" d="M330 300C330 180 400 120 470 120C540 120 600 180 600 300" />
+          <path class="d" d="M100 300V140M120 300V130M140 300V115M180 300V75M200 300V85M220 300V100" />
+          <path class="d" d="M240 80H330M240 120H330M240 160H330M240 200H330M240 240H330M240 280H330" />
+          <path class="d" d="M380 300V170M420 300V140M470 300V120M520 300V140M560 300V170" />
+          <circle class="d" cx="470" cy="210" r="46" />
+          <path class="d accent" d="M20 300L620 20" />
+        </g>
+      </svg>
+      <div class="pl-count display"><span id="pl-num">000</span></div>
+      <div class="pl-bar"><i id="pl-bar"></i></div>
+      <div id="pl-enter" class="pl-enter" hidden>
+        <p class="serif">Una experiencia inmersiva. Usa auriculares si puedes.</p>
+        <div class="pl-buttons">
+          <button type="button" data-sound="1" data-cursor="ENTRAR">Entrar con sonido</button>
+          <button type="button" data-sound="0" class="ghost" data-cursor="ENTRAR">En silencio</button>
+        </div>
+      </div>
+      <div class="pl-bottom mono">
+        <span>INSTITUTO DE ARQUITECTURA NO EUCLIDIANA</span>
+        <span>EST. ∞</span>
+      </div>
+    </div>
+
+    <div class="fallback mono">
+      <p>Esta experiencia necesita WebGL 2. Prueba con un navegador actualizado (Chrome, Edge, Firefox o Safari 15+).</p>
+    </div>
+
+    <!-- ═══════════════ CURSOR -->
+    <div id="cursor" aria-hidden="true">
+      <div class="cx-h"></div>
+      <div class="cx-v"></div>
+      <div class="c-ring"></div>
+      <div class="c-dot"></div>
+      <div class="c-label mono"></div>
+      <div class="c-coords mono"></div>
+    </div>
+
+    <!-- ═══════════════ HUD -->
+    <header id="hud" class="mono" data-ui>
+      <button class="brand" type="button" data-goto="0" aria-label="Volver al inicio">APEIRON<sup>®</sup></button>
+      <nav class="hud-nav" aria-label="Escenas">
+        <button type="button" data-goto="0"><i>01</i>Umbral</button>
+        <button type="button" data-goto="1"><i>02</i>Imposible</button>
+        <button type="button" data-goto="2"><i>03</i>Transformación</button>
+        <button type="button" data-goto="3"><i>04</i>Laboratorio</button>
+        <button type="button" data-goto="4"><i>05</i>Apeiron</button>
+      </nav>
+      <div class="hud-right">
+        <span class="anom" title="Anomalías encontradas">ANOMALÍAS <b id="anomalies">0/4</b></span>
+        <button id="sound" type="button" aria-pressed="false" data-cursor="AUDIO"><span class="eq"><i></i><i></i><i></i><i></i></span>SONIDO <b>OFF</b></button>
+      </div>
+    </header>
+
+    <aside id="rail" class="mono" aria-hidden="true">
+      <div class="rail-track"><i id="rail-fill"></i></div>
+    </aside>
+
+    <div id="toast" class="mono" role="status" aria-live="polite"></div>
+
+    <main id="main">
+      <!-- ═══════════════ 01 UMBRAL -->
+      <section class="scene" id="s1" data-index="0" aria-label="Umbral">
+        <div class="pin s1">
+          <div class="s1-meta mono reveal">
+            <span>FIG. 01</span><span>UMBRAL</span><span>41.3851° N — 2.1734° E</span><span>COTA ±0.00</span>
+          </div>
+          <h1 class="s1-title display">
+            <span class="line" data-split>HABITAR</span>
+            <span class="line mid"><em class="serif">lo</em></span>
+            <span class="line" data-split>IMPOSIBLE</span>
+          </h1>
+          <p class="s1-lead reveal">
+            Un instituto donde los edificios no se construyen: se <em class="serif">calculan</em>. Todo lo que verás lo está generando tu tarjeta gráfica en este instante.
+          </p>
+          <div class="s1-cue mono reveal"><span>Descender</span><i class="cue-line"></i></div>
+          <div class="s1-hint mono reveal">[ MUEVE ] perturbar la ciudad &nbsp;·&nbsp; [ CLIC ] onda sísmica</div>
+          <div class="s1-late">
+            <p class="mono">MANIFIESTO / 01</p>
+            <p class="serif big">«La arquitectura no obedece a la gravedad.<br />Obedece a las ecuaciones.»</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══════════════ 02 ESPACIO IMPOSIBLE -->
+      <section class="scene" id="s2" data-index="1" aria-label="Espacio imposible">
+        <div class="pin s2">
+          <div class="fig mono">FIG. 02 — ESPACIO IMPOSIBLE</div>
+          <div class="s2-big s2-big-a display outline" aria-hidden="true">ESPACIO&nbsp;ESPACIO</div>
+          <div class="s2-big s2-big-b display" aria-hidden="true">IMPOSIBLE</div>
+          <h2 class="s2-head serif">Corredores que se <em>pliegan</em> sobre sí mismos.</h2>
+          <p class="s2-lead">
+            Un solo shader calcula cada píxel lanzando rayos contra funciones de distancia infinitas. No hay modelos: solo matemáticas que se repiten sin final.
+          </p>
+          <ul class="rooms mono">
+            <li class="is-on"><b>A</b><span>Columnata infinita</span><small>bóvedas de arista · módulo 6 m</small></li>
+            <li><b>B</b><span>Celosía de Menger</span><small>fractal · dimensión 2.7268</small></li>
+            <li><b>C</b><span>Galería helicoidal</span><small>torsión 3.4° / m</small></li>
+          </ul>
+          <div class="s2-readout mono">PROFUNDIDAD <span id="depth">0000.00</span> m</div>
+          <div class="hint mono">[ MUEVE ] mirar &nbsp;·&nbsp; [ CLIC ] plegar el espacio &nbsp;·&nbsp; [ MANTÉN ] vértigo</div>
+        </div>
+      </section>
+
+      <!-- ═══════════════ 03 TRANSFORMACIÓN -->
+      <section class="scene" id="s3" data-index="2" aria-label="Transformación">
+        <div class="pin s3">
+          <div class="fig mono">FIG. 03 — TRANSFORMACIÓN</div>
+          <h2 class="s3-title display" aria-label="Transformación"><span class="w1">TRANS</span><span class="w2"><em class="serif">—</em>FORMA</span></h2>
+          <div class="form-info">
+            <div class="mono form-meta"><span id="form-num">01</span> / 04 &nbsp;·&nbsp; <span id="mods"></span> MÓDULOS</div>
+            <div class="form-name display" id="form-name">TORRE HELICOIDAL</div>
+            <div class="form-eq mono" id="form-eq">θ(y) = 0.07·y</div>
+          </div>
+          <div class="forms" data-ui role="group" aria-label="Elegir estructura">
+            <button type="button" data-form="0" class="is-on" data-cursor="TRANSFORMAR"><i>01</i>Torre helicoidal</button>
+            <button type="button" data-form="1" data-cursor="TRANSFORMAR"><i>02</i>Hiperboloide</button>
+            <button type="button" data-form="2" data-cursor="TRANSFORMAR"><i>03</i>Cúpula geodésica</button>
+            <button type="button" data-form="3" data-cursor="TRANSFORMAR"><i>04</i>Nudo tórico</button>
+          </div>
+          <div class="hint mono">[ CLIC ] detonar &nbsp;·&nbsp; [ ARRASTRA ] rotar &nbsp;·&nbsp; [ MANTÉN ] ???</div>
+        </div>
+      </section>
+
+      <!-- ═══════════════ 04 LABORATORIO -->
+      <section class="scene" id="s4" data-index="3" aria-label="Laboratorio">
+        <div class="pin s4">
+          <div id="lab-stage" class="lab-stage" data-cursor="ORBITAR"></div>
+          <div class="fig mono">FIG. 04 — LABORATORIO</div>
+          <h2 class="s4-title display">DISEÑA<br />LO <em class="serif">imposible</em></h2>
+          <div class="lab-stats mono">
+            <div><small>Altura</small><b id="st-height">—</b></div>
+            <div><small>Plantas</small><b id="st-floors">—</b></div>
+            <div><small>Superficie</small><b id="st-area">—</b></div>
+            <div><small>Torsión</small><b id="st-twist">—</b></div>
+          </div>
+          <form id="lab" class="lab-panel mono" data-ui onsubmit="return false">
+            <div class="lab-head"><span>PARÁMETROS</span><button type="button" id="mutate" data-cursor="MUTAR">Mutar ↻</button></div>
+            <label class="ctl"><span>Plantas</span><output for="p-floors"></output>
+              <input id="p-floors" name="floors" type="range" min="6" max="90" step="1" /></label>
+            <label class="ctl"><span>Torsión</span><output for="p-twist"></output>
+              <input id="p-twist" name="twist" type="range" min="0" max="720" step="1" /></label>
+            <label class="ctl"><span>Ahusamiento</span><output for="p-taper"></output>
+              <input id="p-taper" name="taper" type="range" min="0.2" max="1.6" step="0.01" /></label>
+            <label class="ctl"><span>Pulso</span><output for="p-bulge"></output>
+              <input id="p-bulge" name="bulge" type="range" min="-0.5" max="0.8" step="0.01" /></label>
+            <label class="ctl"><span>Despiece</span><output for="p-explode"></output>
+              <input id="p-explode" name="explode" type="range" min="0" max="1.5" step="0.01" /></label>
+            <label class="ctl"><span>Hora</span><output for="p-time"></output>
+              <input id="p-time" name="time" type="range" min="0" max="1" step="0.005" /></label>
+            <div class="seg"><span>Planta</span>
+              <div class="seg-btns">
+                <button type="button" data-sides="3">△</button><button type="button" data-sides="4">□</button><button type="button" data-sides="5">⬠</button><button type="button" data-sides="6">⬡</button><button type="button" data-sides="8">8</button><button type="button" data-sides="48">○</button>
+              </div>
+            </div>
+            <div class="seg"><span>Material</span>
+              <div class="seg-btns mats">
+                <button type="button" data-mat="0" class="is-on">Hormigón</button><button type="button" data-mat="1">Cristal</button><button type="button" data-mat="2">Cromo</button><button type="button" data-mat="3">Plano</button><button type="button" data-mat="4">Holograma</button>
+              </div>
+            </div>
+          </form>
+          <div class="hint mono lab-hint">[ ARRASTRA ] orbitar &nbsp;·&nbsp; [ R ] mutar &nbsp;·&nbsp; ¿una torre de tres lados puede girar dos veces?</div>
+        </div>
+      </section>
+
+      <!-- ═══════════════ 05 APEIRON -->
+      <section class="scene" id="s5" data-index="4" aria-label="Apeiron">
+        <div class="pin s5">
+          <div class="fig mono">FIG. 05 — ΑΠΕΙΡΟΝ</div>
+          <div class="s5-lines">
+            <p class="s5-line serif" data-at="0.03" data-until="0.14">Todo lo que has visto</p>
+            <p class="s5-line" data-at="0.16" data-until="0.36"><b class="display" id="pcount">140.000</b><span class="mono">partículas · una sola estructura</span></p>
+            <p class="s5-line serif" data-at="0.4" data-until="0.52">obedeciendo a una sola idea</p>
+            <p class="s5-line mono small" data-at="0.66" data-until="0.8">ἄπειρον — «lo que no tiene límites» — Anaximandro, s. VI a.C.</p>
+          </div>
+          <div class="s5-end" id="end">
+            <div class="inf display reveal">∞</div>
+            <p class="serif reveal">El espacio no termina.<br />Solo cambia de forma.</p>
+            <div class="end-meta mono reveal">ANOMALÍAS ENCONTRADAS <b id="end-anomalies">0/4</b></div>
+            <button id="restart" type="button" class="reveal" data-ui data-cursor="REBOBINAR">Volver al umbral ↺</button>
+            <div class="credits mono reveal">
+              <span>APEIRON — Instituto de Arquitectura No Euclidiana</span>
+              <span>Three.js · GLSL · GSAP · Lenis · Web Audio</span>
+              <span>Geometría 100 % procedural · 2026</span>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
